@@ -30,7 +30,7 @@ This playbook shows you how to deploy LM Studio on your **hardware platform** to
 
 ## What you'll accomplish
 
-You'll deploy LM Studio on your hardware platform to run **Nemotron 3 Nano Omni** (`nvidia/nemotron-3-nano-omni`), and use the model from your laptop. More specifically, you will:
+You'll deploy LM Studio on your hardware platform to run **Nemotron 3.5 Super VL** (`nvidia/nemotron-3.5-super-vl`), NVIDIA's 120B-parameter vision-language model with 12B active parameters, and use the model from your laptop. More specifically, you will:
 
 - Install **llmster**, a headless, terminal-native LM Studio on the hardware platform
 - Run LLM inference locally via API
@@ -55,7 +55,7 @@ Use the matrix below to confirm your hardware platform, recommended defaults, an
 
 | Hardware platform | OS | Memory | Recommended default local settings | Multi-node capable hardware |
 | :---- | :---- | :---- | :---- | :---- |
-| **DGX Spark** | DGX OS | 128 GB Unified Memory | llmster (`lms`) · API on port `1234` · example model `nvidia/nemotron-3-nano-omni` | — |
+| **DGX Spark** | DGX OS | 128 GB Unified Memory | llmster (`lms`) · API on port `1234` · example model `nvidia/nemotron-3.5-super-vl` | — |
 
 > [!NOTE]
 > Only platforms listed in the Supported hardware platforms table above are covered by this playbook.
@@ -65,8 +65,8 @@ Use the matrix below to confirm your hardware platform, recommended defaults, an
 **Hardware requirements**
 
 - Supported hardware platform — see Supported hardware platforms matrix above
-- Minimum 65 GB memory for model inference (70 GB or above recommended for the example model)
-- At least 65 GB available storage for model downloads (70 GB or above recommended)
+- The Q4_K_M example uses approximately 70.1 GB of model weights plus a 1.7 GB vision projector. Leave additional memory for the operating system, context, visual inputs, and runtime buffers.
+- Allow at least 80 GB of available storage for the model download and runtime files
 
 **Software requirements**
 
@@ -82,11 +82,11 @@ Browse supported models and download paths on the [LM Studio model catalog](http
 | ----------------- | ------------ |
 | **DGX Spark** | [LM Studio model catalog](https://lmstudio.ai/models) |
 
-Example models validated for the workflow in this playbook:
+Example models for the workflow in this playbook:
 
 | Model | Model path |
 |-------|------------|
-| **Nemotron 3 Nano Omni** | `nvidia/nemotron-3-nano-omni` |
+| **Nemotron 3.5 Super VL** | `nvidia/nemotron-3.5-super-vl` |
 | **Qwen3.6-35B-A3B** | `qwen/qwen3.6-35b-a3b` |
 | **GPT-OSS-120B** | `openai/gpt-oss-120b` |
 
@@ -116,8 +116,8 @@ Sample scripts for Step 7 of **Instructions** (hosted by LM Studio docs):
 - **Risk level:** Low
   - Large model downloads may take significant time depending on network speed
 - **Rollback:** Downloaded models can be removed manually from the models directory. Uninstall LM Studio or llmster (see Cleanup in the **Instructions** tab).
-- **Last Updated:** 07/31/2026
-  - Hardware platforms matrix, Find model recipes, and Agent-ready Models for serving LLMs with LM Studio
+- **Last Updated:** 10/19/2026
+  - Use Nemotron 3.5 Super VL as the example and update model memory and storage guidance
 
 ## Instructions
 
@@ -183,13 +183,13 @@ LM Link is in **Preview** and is free for up to 2 users, 5 devices each. For det
 
 ## Step 5. Download a model to your hardware platform
 
-As an example, download **NVIDIA Nemotron 3 Nano Omni** from the LM Studio catalog (`nvidia/nemotron-3-nano-omni`):
+As an example, download **NVIDIA Nemotron 3.5 Super VL** from the [LM Studio catalog](https://lmstudio.ai/models/nvidia/nemotron-3.5-super-vl). Select the Q4_K_M GGUF quantization for this walkthrough:
 
 ```bash
-lms get nvidia/nemotron-3-nano-omni
+lms get nvidia/nemotron-3.5-super-vl@q4_k_m
 ```
 
-This download can take a while due to its size. Verify the download:
+The download is approximately 72 GB including the vision projector and may take a while. Verify the download:
 
 ```bash
 lms ls
@@ -200,7 +200,7 @@ lms ls
 Load the model on your hardware platform so it can respond to requests from your laptop:
 
 ```bash
-lms load nvidia/nemotron-3-nano-omni
+lms load nvidia/nemotron-3.5-super-vl
 ```
 
 ## Step 7. Use the LM Studio SDK on the laptop

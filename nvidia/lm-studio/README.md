@@ -27,7 +27,7 @@ This playbook shows you how to deploy LM Studio on an NVIDIA DGX Spark device to
 
 ## What you'll accomplish
 
-You'll deploy LM Studio on an NVIDIA DGX Spark device to run **Nemotron 3 Nano Omni** (`nvidia/nemotron-3-nano-omni`), and use the model from your laptop. More specifically, you will:
+You'll deploy LM Studio on an NVIDIA DGX Spark device to run **Nemotron 3.5 Super VL** (`nvidia/nemotron-3.5-super-vl`), NVIDIA's 120B-parameter vision-language model with 12B active parameters, and use the model from your laptop. More specifically, you will:
 
 - Install **llmster**, a totally headless, terminal native LM Studio on the Spark
 - Run LLM inference locally on DGX Spark via API
@@ -44,9 +44,9 @@ You'll deploy LM Studio on an NVIDIA DGX Spark device to run **Nemotron 3 Nano O
 ## Prerequisites
 
 **Hardware Requirements:**
-- DGX Spark device with ARM64 processor and Blackwell GPU architecture
-- Minimum 65GB GPU memory, 70GB or above is recommended
-- At least 65GB available storage space, 70GB or above is recommended 
+- DGX Spark device with ARM64 processor, Blackwell GPU architecture, and 128 GB unified memory
+- The Q4_K_M example uses approximately 70.1 GB of model weights plus a 1.7 GB vision projector. Leave additional memory for the operating system, context, visual inputs, and runtime buffers.
+- Allow at least 80 GB of available storage for the model download and runtime files
 
 **Software Requirements:**
 - NVIDIA DGX OS
@@ -59,7 +59,7 @@ To explore all supported models in LM Studio, check out [LM Studio model catalog
 
 | Model | Support Status | Model Path |
 |-------|----------------|-----------|
-| **Nemotron 3 Nano Omni** | ✅ | `nvidia/nemotron-3-nano-omni` |
+| **Nemotron 3.5 Super VL** | ✅ | `nvidia/nemotron-3.5-super-vl` |
 | **Qwen3.6-35B-A3B** | ✅ | `qwen/qwen3.6-35b-a3b` |
 | **GPT-OSS-120B** | ✅ | `openai/gpt-oss-120b` |
 
@@ -89,8 +89,8 @@ All required assets can be found below. These sample scripts can be used in Step
 * **Rollback:**
   * Downloaded models can be removed manually from the models directory.
   * Uninstall LM Studio or llmster
-* **Last Updated:** 04/28/2026
-  * Introduce Nemotron Omni as example
+* **Last Updated:** 10/19/2026
+  * Use Nemotron 3.5 Super VL as the example and update model memory and storage guidance
 
 ## Instructions
 
@@ -159,13 +159,13 @@ LM Link is in **Preview** and is free for up to 2 users, 5 devices each. For det
 
 ## Step 5. Download a model to your Spark
 
-As an example, download **NVIDIA Nemotron 3 Nano Omni** from the LM Studio catalog (`nvidia/nemotron-3-nano-omni`) so you can run it on Spark with plenty of unified memory.
+As an example, download **NVIDIA Nemotron 3.5 Super VL** from the [LM Studio catalog](https://lmstudio.ai/models/nvidia/nemotron-3.5-super-vl). Select the Q4_K_M GGUF quantization for this walkthrough:
 
 ```bash
-lms get nvidia/nemotron-3-nano-omni
+lms get nvidia/nemotron-3.5-super-vl@q4_k_m
 ```
 
-This download will take a while due to its large size. Verify that the model has been successfully downloaded by listing your models:
+The download is approximately 72 GB including the vision projector and may take a while. Verify that the model has been successfully downloaded by listing your models:
 
 ```bash
 lms ls
@@ -176,7 +176,7 @@ lms ls
 Load the model on your Spark so that it is ready to respond to requests from your laptop.
 
 ```bash
-lms load nvidia/nemotron-3-nano-omni
+lms load nvidia/nemotron-3.5-super-vl
 ```
 
 ## Step 7. Set up a simple program that uses LM Studio SDK on the laptop
